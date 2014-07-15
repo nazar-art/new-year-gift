@@ -1,154 +1,149 @@
 package com.epam.lab.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Formatter;
-
+import com.epam.lab.model.ItemGiftBuilder;
+import com.epam.lab.model.ItemGiftParser;
+import com.epam.lab.model.NewYearGift;
+import com.epam.lab.model.exceptions.CreateDocumentConfigurationException;
+import com.epam.lab.model.sweets.Sweets;
 import org.apache.log4j.Logger;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 
-import com.epam.lab.model.ItemGiftBuilder;
-import com.epam.lab.model.ItemGiftParser;
-import com.epam.lab.model.NewYearGift;
-import com.epam.lab.model.exceptions.CreateDocumentConfigurationException;
-import com.epam.lab.model.sweets.Sweets;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Formatter;
 
 public class GiftController {
 
-	private static final Logger LOG = Logger.getLogger(GiftController.class);
+    private static final Logger LOG = Logger.getLogger(GiftController.class);
 
-	private NewYearGift newYearGift;
+    private NewYearGift newYearGift;
 
-	private ArrayList<Sweets> items;
+    private ArrayList<Sweets> items;
 
-	private Formatter formatter = new Formatter(System.out);
-	
-	private ItemGiftParser giftParser;
+    private Formatter formatter = new Formatter(System.out);
 
-	private double totalWeight = 0;
+    private ItemGiftParser giftParser;
 
-	private int counter = 1;
+    private double totalWeight = 0;
 
-	private final static int START_OF_COUNT = 1;
+    private int counter = 1;
 
-	public void setCounter(int counter) {
-		this.counter = counter;
-	}
+    private final static int START_OF_COUNT = 1;
 
-	public void setTotalWeight(double totalWeight) {
-		this.totalWeight = totalWeight;
-	}
+    public void setCounter(int counter) {
+        this.counter = counter;
+    }
 
-	public GiftController() throws CreateDocumentConfigurationException {
-		items = new ArrayList<Sweets>();
-		newYearGift = new NewYearGift();
-		formatter = new Formatter(System.out);
-		giftParser = new ItemGiftParser();
-		totalWeight = 0;
-	}
+    public void setTotalWeight(double totalWeight) {
+        this.totalWeight = totalWeight;
+    }
 
-	private void printTitle(String msg) {
-		formatter.format("%-38s\n\n", msg);
-		formatter.format("%-3s%-20s %5s %10s\n", "#", "Name", "Sugar", "Weight");
-		formatter.format("%-3s%-20s %5s %10s\n", "-", "----", "-----", "------");
-	}
+    public GiftController() throws CreateDocumentConfigurationException {
+        items = new ArrayList<Sweets>();
+        newYearGift = new NewYearGift();
+        formatter = new Formatter(System.out);
+        giftParser = new ItemGiftParser();
+        totalWeight = 0;
+    }
 
-	private void print(Sweets item) {
-		formatter.format("%-3d%-20.15s %5.2f %10.2f\n", counter++, item
-				.getClass().getSimpleName(), item.getSugarLevel(), item
-				.getWeight());
-		totalWeight += item.getWeight();
-	}
+    private void printTitle(String msg) {
+        formatter.format("%-38s\n\n", msg);
+        formatter.format("%-3s%-20s %5s %10s\n", "#", "Name", "Sugar", "Weight");
+        formatter.format("%-3s%-20s %5s %10s\n", "-", "----", "-----", "------");
+    }
 
-	private void printTotalWeight() {
-		formatter.format("%-23s %5s %10s\n", "", "", "------");
-		formatter.format("%-3s%-20s %5s %10.2f\n", "", "Total Weight", "",
-				totalWeight);
-	}
+    private void print(Sweets item) {
+        formatter.format("%-3d%-20.15s %5.2f %10.2f\n", counter++, item
+                .getClass().getSimpleName(), item.getSugarLevel(), item
+                .getWeight());
+        totalWeight += item.getWeight();
+    }
 
-	private void printSpace() {
-		formatter.format("\n%-38s\n\n\n",
-				"========================================");
-	}
+    private void printTotalWeight() {
+        formatter.format("%-23s %5s %10s\n", "", "", "------");
+        formatter.format("%-3s%-20s %5s %10.2f\n", "", "Total Weight", "",
+                totalWeight);
+    }
 
-	private void generateGift(int nTimew) {
-		items = newYearGift.generate(nTimew);
+    private void printSpace() {
+        formatter.format("\n%-38s\n\n\n",
+                "========================================");
+    }
 
-		for (Sweets sweet : items) {
-			print(sweet);
-		}
-	}
+    private void generateGift(int nTimew) {
+        items = newYearGift.generate(nTimew);
 
-	private void printGift() {
-		for (int i = 0; i < items.size(); i++) {
-			print(items.get(i));
-		}
-	}
+        for (Sweets sweet : items) {
+            print(sweet);
+        }
+    }
 
-	private void printGift(ArrayList<Sweets> sweets) {
-		for (int i = 0; i < sweets.size(); i++) {
-			print(sweets.get(i));
-		}
-	}
+    private void printGift() {
+        for (Sweets item : items) {
+            print(item);
+        }
+    }
 
-	public void writetoXmlFile(String xmlContent) {
-		File theDir = new File("./output");
-		if (!theDir.exists())
-			theDir.mkdir();
+    private void printGift(ArrayList<Sweets> sweets) {
+        for (Sweets sweet : sweets) {
+            print(sweet);
+        }
+    }
 
-		String fileName = "./output/" + this.getClass().getSimpleName() + "_"
-				+ Calendar.getInstance().getTimeInMillis() + ".xml";
+    public void writetoXmlFile(String xmlContent) {
+        File theDir = new File("./output");
+        if (!theDir.exists())
+            theDir.mkdir();
 
-		try (OutputStream stream = new FileOutputStream(new File(fileName))) {
-			try (OutputStreamWriter out = new OutputStreamWriter(stream,
-					StandardCharsets.UTF_16)) {
-				out.write(xmlContent.toString());
-				out.write("\n");
-			}
-		} catch (IOException ex) {
-			LOG.error("Cannot write to file!", ex);
-		}
-	}
+        String fileName = "./output/" + this.getClass().getSimpleName() + "_"
+                + Calendar.getInstance().getTimeInMillis() + ".xml";
 
-	private String generateXml(ItemGiftBuilder builder) {
+        try (OutputStream stream = new FileOutputStream(new File(fileName))) {
+            try (OutputStreamWriter out = new OutputStreamWriter(stream,
+                    StandardCharsets.UTF_16)) {
+                out.write(xmlContent);
+                out.write("\n");
+            }
+        } catch (IOException ex) {
+            LOG.error("Cannot write to file!", ex);
+        }
+    }
 
-		String out = null;
+    private String generateXml(ItemGiftBuilder builder) {
 
-		Document doc = builder.build(items);
-		DOMImplementation impl = doc.getImplementation();
-		DOMImplementationLS implLS = (DOMImplementationLS) impl.getFeature(
-				"LS", "3.0");
+        String out = null;
 
-		LSSerializer ser = implLS.createLSSerializer();
-		ser.getDomConfig().setParameter("format-pretty-print", true);
-		out = ser.writeToString(doc);
+        Document doc = builder.build(items);
+        DOMImplementation impl = doc.getImplementation();
+        DOMImplementationLS implLS = (DOMImplementationLS) impl.getFeature(
+                "LS", "3.0");
 
-		return out;
-	}
+        LSSerializer ser = implLS.createLSSerializer();
+        ser.getDomConfig().setParameter("format-pretty-print", true);
+        out = ser.writeToString(doc);
 
-	private ArrayList<Sweets> extractSugar(double start, double end) {
-		ArrayList<Sweets> exList = new ArrayList<>();
-		Collections.sort(items, newYearGift.getSugarLevelComparator());
+        return out;
+    }
 
-		for (Sweets sweet : items) {
-			double value = sweet.getSugarLevel();
-			if (value >= start && value <= end) {
-				exList.add(sweet);
-			}
-		}
+    private ArrayList<Sweets> extractSugar(double start, double end) {
+        ArrayList<Sweets> exList = new ArrayList<>();
+        Collections.sort(items, newYearGift.getSugarLevelComparator());
 
-		return exList;
-	}
+        for (Sweets sweet : items) {
+            double value = sweet.getSugarLevel();
+            if (value >= start && value <= end) {
+                exList.add(sweet);
+            }
+        }
+
+        return exList;
+    }
 
 /*	public static void main(String[] args) throws CreateDocumentConfigurationException {
 
@@ -172,76 +167,76 @@ public class GiftController {
 		//giftController.writeToXmlFile();
 	}*/
 
-	public void showExtractedSugar(double lowLimit, double higherLimit) {
-		ArrayList<Sweets> extract = extractSugar(lowLimit, higherLimit);
-		printTitle("New Year's Gift with extracted sugar\n(from "
-						+ lowLimit + " to " + higherLimit + "):");
-		printGift(extract);
-		printTotalWeight();
-		printSpace();
-		setCountersToStart();
-	}
+    public void showExtractedSugar(double lowLimit, double higherLimit) {
+        ArrayList<Sweets> extract = extractSugar(lowLimit, higherLimit);
+        printTitle("New Year's Gift with extracted sugar\n(from "
+                + lowLimit + " to " + higherLimit + "):");
+        printGift(extract);
+        printTotalWeight();
+        printSpace();
+        setCountersToStart();
+    }
 
-	public void writeToXmlFile()
-			throws CreateDocumentConfigurationException {
-		ItemGiftBuilder builder = new ItemGiftBuilder();
-		String xmlContent = generateXml(builder);
-		writetoXmlFile(xmlContent);
-	}
+    public void writeToXmlFile()
+            throws CreateDocumentConfigurationException {
+        ItemGiftBuilder builder = new ItemGiftBuilder();
+        String xmlContent = generateXml(builder);
+        writetoXmlFile(xmlContent);
+    }
 
-	public void showSortedBySugar() {
-		Collections.sort(items, newYearGift.getSugarLevelComparator());
-		printTitle("New Year's Gift by sorted Sugar level:");
-		printGift();
-		printTotalWeight();
-		printSpace();
-		setCountersToStart();
-	}
+    public void showSortedBySugar() {
+        Collections.sort(items, newYearGift.getSugarLevelComparator());
+        printTitle("New Year's Gift by sorted Sugar level:");
+        printGift();
+        printTotalWeight();
+        printSpace();
+        setCountersToStart();
+    }
 
-	public void showSortedByWeight() {
-		Collections.sort(items, newYearGift.getWeightComparator());
-		printTitle("New Year's Gift by sorted Weigth:");
-		printGift();
-		printTotalWeight();
-		printSpace();
-		setCountersToStart();
-	}
+    public void showSortedByWeight() {
+        Collections.sort(items, newYearGift.getWeightComparator());
+        printTitle("New Year's Gift by sorted Weigth:");
+        printGift();
+        printTotalWeight();
+        printSpace();
+        setCountersToStart();
+    }
 
-	public void showGiftContent(int nTimes) {
-		printTitle("New Year's Gift (list of contents):");
-		generateGift(nTimes);
-		printTotalWeight();
-		printSpace();
-		setCountersToStart();
-	}
+    public void showGiftContent(int nTimes) {
+        printTitle("New Year's Gift (list of contents):");
+        generateGift(nTimes);
+        printTotalWeight();
+        printSpace();
+        setCountersToStart();
+    }
 
-	public void parseXmlFile(File selectedFile) {
-		try {
-			items = giftParser.parse(selectedFile);
-		} catch (Exception e) {
-			LOG.error("Error parsing file!", e);
-		}
-		showParsedData();
-	}
+    public void parseXmlFile(File selectedFile) {
+        try {
+            items = giftParser.parse(selectedFile);
+        } catch (Exception e) {
+            LOG.error("Error parsing file!", e);
+        }
+        showParsedData();
+    }
 
-	public void showParsedData() {
-		printTitle("New Year's Gift (list of contents):");
-		for (Sweets sweet : items) {
-			print(sweet);
-		}
-		printTotalWeight();
-		printSpace();
-		
-		// set to start
-		setCountersToStart();
-		// outout by sorted parameters
-		showSortedBySugar();
-		showSortedByWeight();
-	}
+    public void showParsedData() {
+        printTitle("New Year's Gift (list of contents):");
+        for (Sweets sweet : items) {
+            print(sweet);
+        }
+        printTotalWeight();
+        printSpace();
 
-	private void setCountersToStart() {
-		setCounter(START_OF_COUNT);
-		setTotalWeight(0);
-	}
+        // set to start
+        setCountersToStart();
+        // outout by sorted parameters
+        showSortedBySugar();
+        showSortedByWeight();
+    }
+
+    private void setCountersToStart() {
+        setCounter(START_OF_COUNT);
+        setTotalWeight(0);
+    }
 
 }
