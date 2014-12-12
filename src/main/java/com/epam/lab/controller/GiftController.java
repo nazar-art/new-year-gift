@@ -19,14 +19,13 @@ import java.util.Collections;
 import java.util.Formatter;
 
 public class GiftController {
-
     private static final Logger LOG = Logger.getLogger(GiftController.class);
 
     private NewYearGift newYearGift;
 
     private ArrayList<Sweets> items;
 
-    private Formatter formatter = new Formatter(System.out);
+    private Formatter formatter;
 
     private ItemGiftParser giftParser;
 
@@ -76,8 +75,8 @@ public class GiftController {
                 "========================================");
     }
 
-    private void generateGift(int nTimew) {
-        items = newYearGift.generate(nTimew);
+    private void generateGift(int nTimes) {
+        items = newYearGift.generate(nTimes);
 
         for (Sweets sweet : items) {
             print(sweet);
@@ -96,7 +95,7 @@ public class GiftController {
         }
     }
 
-    public void writetoXmlFile(String xmlContent) {
+    public void writeToXmlFile(String xmlContent) {
         File theDir = new File("./output");
         if (!theDir.exists())
             theDir.mkdir();
@@ -105,8 +104,7 @@ public class GiftController {
                 + Calendar.getInstance().getTimeInMillis() + ".xml";
 
         try (OutputStream stream = new FileOutputStream(new File(fileName))) {
-            try (OutputStreamWriter out = new OutputStreamWriter(stream,
-                    StandardCharsets.UTF_16)) {
+            try (OutputStreamWriter out = new OutputStreamWriter(stream, StandardCharsets.UTF_16)) {
                 out.write(xmlContent);
                 out.write("\n");
             }
@@ -116,13 +114,11 @@ public class GiftController {
     }
 
     private String generateXml(ItemGiftBuilder builder) {
-
         String out = null;
 
         Document doc = builder.build(items);
         DOMImplementation impl = doc.getImplementation();
-        DOMImplementationLS implLS = (DOMImplementationLS) impl.getFeature(
-                "LS", "3.0");
+        DOMImplementationLS implLS = (DOMImplementationLS) impl.getFeature("LS", "3.0");
 
         LSSerializer ser = implLS.createLSSerializer();
         ser.getDomConfig().setParameter("format-pretty-print", true);
@@ -177,11 +173,10 @@ public class GiftController {
         setCountersToStart();
     }
 
-    public void writeToXmlFile()
-            throws CreateDocumentConfigurationException {
+    public void writeToXmlFile() throws CreateDocumentConfigurationException {
         ItemGiftBuilder builder = new ItemGiftBuilder();
         String xmlContent = generateXml(builder);
-        writetoXmlFile(xmlContent);
+        writeToXmlFile(xmlContent);
     }
 
     public void showSortedBySugar() {
@@ -195,7 +190,7 @@ public class GiftController {
 
     public void showSortedByWeight() {
         Collections.sort(items, newYearGift.getWeightComparator());
-        printTitle("New Year's Gift by sorted Weigth:");
+        printTitle("New Year's Gift by sorted Weigh:");
         printGift();
         printTotalWeight();
         printSpace();
@@ -229,7 +224,7 @@ public class GiftController {
 
         // set to start
         setCountersToStart();
-        // outout by sorted parameters
+        // output by sorted parameters
         showSortedBySugar();
         showSortedByWeight();
     }

@@ -49,7 +49,7 @@ public class SweetsGenerator implements Generator<Sweets>, Iterable<Sweets> {
     }
 
 	/*
-	 * public Sweets next() { // Old version try { return (Sweets)
+     * public Sweets next() { // Old version try { return (Sweets)
 	 * types[rand.nextInt(types.length)].newInstance(); // Report programmer
 	 * errors at run time: } catch (Exception e) { LOG.error("RuntimeException",
 	 * e); throw new RuntimeException(e); } }

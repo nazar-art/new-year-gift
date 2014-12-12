@@ -1,158 +1,150 @@
 package com.epam.lab.view;
 
-import java.io.File;
-import java.util.ArrayList;
-
-import javax.swing.Box;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import org.apache.log4j.Logger;
-
 import com.epam.lab.controller.GiftController;
 import com.epam.lab.model.exceptions.CreateDocumentConfigurationException;
 import com.epam.lab.model.exceptions.InvalidUserInputDataException;
 import com.epam.lab.model.sweets.Sweets;
+import org.apache.log4j.Logger;
+
+import javax.swing.*;
+import java.io.File;
+import java.util.ArrayList;
 
 public class Application {
 
-	private static final Logger LOG = Logger.getLogger(Application.class);
+    private static final Logger LOG = Logger.getLogger(Application.class);
 
-	private GiftController giftController;
-	
-	ArrayList<Sweets> sweets;
-	
-	public Application() throws CreateDocumentConfigurationException {
-		giftController = new GiftController();
-		sweets = new ArrayList<Sweets>();
-	}
+    private GiftController giftController;
 
-	public void start() throws CreateDocumentConfigurationException {
-		// Custom button text
-		Object[] options = { "Yes, please", "I have configuration xml file",
-				"No, thanks!" };
+    ArrayList<Sweets> sweets;
 
-		int n = JOptionPane.showOptionDialog(null,
-				"Would you like to create new random New Year's Gift?",
-				"A Silly Question", JOptionPane.YES_NO_CANCEL_OPTION,
-				JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+    public Application() throws CreateDocumentConfigurationException {
+        giftController = new GiftController();
+        sweets = new ArrayList<Sweets>();
+    }
 
-		estimateUserInput(n);
-	}
+    public void start() throws CreateDocumentConfigurationException {
+        // Custom button text
+        Object[] options = {"Yes, please", "I have configuration xml file",
+                "No, thanks!"};
 
-	private void estimateUserInput(int n) throws CreateDocumentConfigurationException {
-		switch (n) {
-		case 0:
-			process();
-			break;
-		case 1:
-			chooseFile();
-			break;
-		case 2:
-			goodBye();
-			break;
-		}
-	}
+        int n = JOptionPane.showOptionDialog(null,
+                "Would you like to create new random New Year's Gift?",
+                "A Silly Question", JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
 
-	private void chooseFile() {
+        estimateUserInput(n);
+    }
 
-		JFileChooser chooser = new JFileChooser();
+    private void estimateUserInput(int n) throws CreateDocumentConfigurationException {
+        switch (n) {
+            case 0:
+                process();
+                break;
+            case 1:
+                chooseFile();
+                break;
+            case 2:
+                goodBye();
+                break;
+        }
+    }
 
-		if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-			File selectedFile = chooser.getSelectedFile();
-			giftController.parseXmlFile(selectedFile);
-		}
-	}
+    private void chooseFile() {
 
-	private void goodBye() {
-		JOptionPane.showMessageDialog(null, "Good Bye!");
-	}
+        JFileChooser chooser = new JFileChooser();
 
-	private void process() throws CreateDocumentConfigurationException {
+        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = chooser.getSelectedFile();
+            giftController.parseXmlFile(selectedFile);
+        }
+    }
 
-		String[] input = divideUserInput();
-		double start = 0, end = 0;
+    private void goodBye() {
+        JOptionPane.showMessageDialog(null, "Good Bye!");
+    }
 
-		if (input.length < 2) {
-			errorMessage("Input error!");
-			throw new InvalidUserInputDataException();
-		}
-		
-		int quantity = Integer.parseInt(input[0]);
-		start = Double.parseDouble(input[1]);
-		end = Double.parseDouble(input[2]);
+    private void process() throws CreateDocumentConfigurationException {
 
-		// general overwiev
-		giftController.showGiftContent(quantity);
+        String[] input = divideUserInput();
+        double start, end;
 
-		// sort by weight
-		giftController.showSortedByWeight();
+        if (input.length < 2) {
+            errorMessage("Input error!");
+            throw new InvalidUserInputDataException();
+        }
 
-		// sort by sugar level
-		giftController.showSortedBySugar();
+        int quantity = Integer.parseInt(input[0]);
+        start = Double.parseDouble(input[1]);
+        end = Double.parseDouble(input[2]);
 
-		// show gift list with sugar limitation
-		giftController.showExtractedSugar(start, end);
+        // general overview
+        giftController.showGiftContent(quantity);
 
-		// write to xml file
-		giftController.writeToXmlFile();
-	}
+        // sort by weight
+        giftController.showSortedByWeight();
 
-	private void errorMessage(String msg) {
-		// custom title, error icon
-		JOptionPane.showMessageDialog(null, msg, "Input error",
-				JOptionPane.ERROR_MESSAGE);
-	}
+        // sort by sugar level
+        giftController.showSortedBySugar();
 
-	private String[] divideUserInput() {
-		return inputGiftInfo().trim().split("\\s");
-	}
+        // show gift list with sugar limitation
+        giftController.showExtractedSugar(start, end);
 
-	private String inputGiftInfo() {
+        // write to xml file
+        giftController.writeToXmlFile();
+    }
 
-		String resultString = "";
-		JTextField quantityField = new JTextField(5);
-		JTextField minSugarField = new JTextField(5);
-		JTextField maxSugarField = new JTextField(5);
+    private void errorMessage(String msg) {
+        // custom title, error icon
+        JOptionPane.showMessageDialog(null, msg, "Input error",
+                JOptionPane.ERROR_MESSAGE);
+    }
 
-		JPanel myPanel = new JPanel();
+    private String[] divideUserInput() {
+        return inputGiftInfo().trim().split("\\s");
+    }
 
-		myPanel.add(new JLabel("Quantity of New Year's Gift:"));
-		myPanel.add(quantityField);
-		myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+    private String inputGiftInfo() {
+        String resultString = "";
+        JTextField quantityField = new JTextField(5);
+        JTextField minSugarField = new JTextField(5);
+        JTextField maxSugarField = new JTextField(5);
 
-		myPanel.add(new JLabel("Min sugar level (form 0):"));
-		myPanel.add(minSugarField);
-		myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+        JPanel myPanel = new JPanel();
 
-		myPanel.add(new JLabel("Max sugar level (to 100):"));
-		myPanel.add(maxSugarField);
+        myPanel.add(new JLabel("Quantity of New Year's Gift:"));
+        myPanel.add(quantityField);
+        myPanel.add(Box.createHorizontalStrut(15)); // a spacer
 
-		int result = JOptionPane.showConfirmDialog(null, myPanel,
-				"Please Enter Droid configuration",
-				JOptionPane.OK_CANCEL_OPTION);
+        myPanel.add(new JLabel("Min sugar level (from 0):"));
+        myPanel.add(minSugarField);
+        myPanel.add(Box.createHorizontalStrut(15)); // a spacer
 
-		// create result string
-		if (result == JOptionPane.OK_OPTION) {
-			resultString = resultString + quantityField.getText() + " "
-					+ minSugarField.getText() + " " + maxSugarField.getText();
+        myPanel.add(new JLabel("Max sugar level (to 100):"));
+        myPanel.add(maxSugarField);
 
-			LOG.debug("the New Year's Gift is created, quantityty "
-					+ quantityField.getText() + " with " + minSugarField
-					+ " min and " + maxSugarField + " max sugar level level");
-		}
+        int result = JOptionPane.showConfirmDialog(null, myPanel,
+                "Please Enter Droid configuration",
+                JOptionPane.OK_CANCEL_OPTION);
 
-		return resultString;
-	}
+        // create result string
+        if (result == JOptionPane.OK_OPTION) {
+            resultString = resultString + quantityField.getText() + " "
+                    + minSugarField.getText() + " " + maxSugarField.getText();
+
+            LOG.debug("the New Year's Gift is created, quantity "
+                    + quantityField.getText() + " with " + minSugarField
+                    + " min and " + maxSugarField + " max sugar level level");
+        }
+
+        return resultString;
+    }
 
 /*	public static void main(String[] args) {
-		try {
+        try {
 			new Application().start();
 		} catch (Exception e) {
-			LOG.error("Error ocurred", e);
+			LOG.error("Error occurred", e);
 			e.printStackTrace();
 		}
 	}*/
