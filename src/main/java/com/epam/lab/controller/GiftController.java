@@ -113,8 +113,8 @@ public class GiftController {
         }
     }
 
-    private String generateXml(ItemGiftBuilder builder) {
-        String out = null;
+    private String generateXmlContent(ItemGiftBuilder builder) {
+        String content = null;
 
         Document doc = builder.build(items);
         DOMImplementation impl = doc.getImplementation();
@@ -122,9 +122,9 @@ public class GiftController {
 
         LSSerializer ser = implLS.createLSSerializer();
         ser.getDomConfig().setParameter("format-pretty-print", true);
-        out = ser.writeToString(doc);
+        content = ser.writeToString(doc);
 
-        return out;
+        return content;
     }
 
     private ArrayList<Sweets> extractSugar(double start, double end) {
@@ -163,6 +163,11 @@ public class GiftController {
 		//giftController.writeToXmlFile();
 	}*/
 
+    public static void main(String[] args) throws CreateDocumentConfigurationException {
+        GiftController giftController = new GiftController();
+        giftController.printTitle("Here is title");
+    }
+
     public void showExtractedSugar(double lowLimit, double higherLimit) {
         ArrayList<Sweets> extract = extractSugar(lowLimit, higherLimit);
         printTitle("New Year's Gift with extracted sugar\n(from "
@@ -175,7 +180,7 @@ public class GiftController {
 
     public void writeToXmlFile() throws CreateDocumentConfigurationException {
         ItemGiftBuilder builder = new ItemGiftBuilder();
-        String xmlContent = generateXml(builder);
+        String xmlContent = generateXmlContent(builder);
         writeToXmlFile(xmlContent);
     }
 
