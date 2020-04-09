@@ -1,28 +1,25 @@
 package com.epam.lab.model;
 
-import java.util.ArrayList;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
+import com.epam.lab.model.exceptions.CreateDocumentConfigurationException;
+import com.epam.lab.model.sweets.Sweet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
-import com.epam.lab.model.exceptions.CreateDocumentConfigurationException;
-import com.epam.lab.model.sweets.Sweets;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.util.ArrayList;
 
 public class ItemGiftBuilder {
 
     private DocumentBuilder builder;
-
     private Document doc;
 
     /**
      * Constructs an item list builder.
      *
-     * @throws CreateDocumentConfigurationException
+     * @throws CreateDocumentConfigurationException exception during document creation.
      */
     public ItemGiftBuilder() throws CreateDocumentConfigurationException {
         try {
@@ -39,7 +36,7 @@ public class ItemGiftBuilder {
      * @param items the items
      * @return a DOM document describing the items
      */
-    public Document build(ArrayList<Sweets> items) {
+    public Document build(ArrayList<Sweet> items) {
         doc = builder.newDocument();
         doc.appendChild(createItems(items));
         return doc;
@@ -51,10 +48,10 @@ public class ItemGiftBuilder {
      * @param items the items
      * @return a DOM element describing the items
      */
-    private Element createItems(ArrayList<Sweets> items) {
+    private Element createItems(ArrayList<Sweet> items) {
         Element e = doc.createElement("gift");
 
-        for (Sweets anItem : items)
+        for (Sweet anItem : items)
             e.appendChild(createItem(anItem));
 
         return e;
@@ -66,15 +63,14 @@ public class ItemGiftBuilder {
      * @param anItem the item
      * @return a DOM element describing the item
      */
-    private Element createItem(Sweets anItem) {
+    private Element createItem(Sweet anItem) {
         Element e = doc.createElement("item");
 
-        e.appendChild(createTextElement("name", "" + anItem.getClass().getSimpleName()));
+        e.appendChild(createTextElement("name", anItem.getClass().getSimpleName()));
         // possibly to set sugar as attribute:
-        e.setAttribute("sugar", anItem.getSugarLevel() + "");
+        e.setAttribute("sugar", String.valueOf(anItem.getSugarLevel()));
         // or as element:
-        //e.appendChild(createTextElement("sugar", "" + anItem.getSugarLevel()));
-        e.appendChild(createTextElement("weight", "" + anItem.getWeight()));
+        e.appendChild(createTextElement("weight", String.valueOf(anItem.getWeight())));
 
         return e;
     }

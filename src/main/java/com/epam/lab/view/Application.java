@@ -3,30 +3,23 @@ package com.epam.lab.view;
 import com.epam.lab.controller.GiftController;
 import com.epam.lab.model.exceptions.CreateDocumentConfigurationException;
 import com.epam.lab.model.exceptions.InvalidUserInputDataException;
-import com.epam.lab.model.sweets.Sweets;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.ArrayList;
 
 public class Application {
-
     private static final Logger LOG = Logger.getLogger(Application.class);
 
     private GiftController giftController;
 
-    ArrayList<Sweets> sweets;
-
     public Application() throws CreateDocumentConfigurationException {
         giftController = new GiftController();
-        sweets = new ArrayList<Sweets>();
     }
 
     public void start() throws CreateDocumentConfigurationException {
         // Custom button text
-        Object[] options = {"Yes, please", "I have configuration xml file",
-                "No, thanks!"};
+        Object[] options = {"Yes, please", "I have configuration xml file", "No, thanks!"};
 
         int n = JOptionPane.showOptionDialog(null,
                 "Would you like to create new random New Year's Gift?",
@@ -36,8 +29,8 @@ public class Application {
         estimateUserInput(n);
     }
 
-    private void estimateUserInput(int n) throws CreateDocumentConfigurationException {
-        switch (n) {
+    private void estimateUserInput(int input) throws CreateDocumentConfigurationException {
+        switch (input) {
             case 0:
                 process();
                 break;
@@ -51,7 +44,6 @@ public class Application {
     }
 
     private void chooseFile() {
-
         JFileChooser chooser = new JFileChooser();
 
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -62,6 +54,7 @@ public class Application {
 
     private void goodBye() {
         JOptionPane.showMessageDialog(null, "Good Bye!");
+        System.exit(0);
     }
 
     private void process() throws CreateDocumentConfigurationException {
@@ -70,7 +63,7 @@ public class Application {
         double start, end;
 
         if (input.length < 2) {
-            errorMessage("Input error!");
+            errorMessage("Invalid user input!");
             throw new InvalidUserInputDataException();
         }
 
@@ -92,12 +85,12 @@ public class Application {
 
         // write to xml file
         giftController.writeToXmlFile();
+        System.exit(0);
     }
 
     private void errorMessage(String msg) {
         // custom title, error icon
-        JOptionPane.showMessageDialog(null, msg, "Input error",
-                JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, msg, "Input error", JOptionPane.ERROR_MESSAGE);
     }
 
     private String[] divideUserInput() {
@@ -129,24 +122,16 @@ public class Application {
 
         // create result string
         if (result == JOptionPane.OK_OPTION) {
-            resultString = resultString + quantityField.getText() + " "
-                    + minSugarField.getText() + " " + maxSugarField.getText();
+            resultString = String.format("%s %s %s",
+                    resultString + quantityField.getText(),
+                    minSugarField.getText(),
+                    maxSugarField.getText());
 
-            LOG.debug("the New Year's Gift is created, quantity "
-                    + quantityField.getText() + " with " + minSugarField
-                    + " min and " + maxSugarField + " max sugar level level");
+            LOG.debug(String.format("New Year's Gift is created, quantity %s with %s min and %s max sugar level level",
+                    quantityField, minSugarField, maxSugarField));
         }
 
         return resultString;
     }
-
-/*	public static void main(String[] args) {
-        try {
-			new Application().start();
-		} catch (Exception e) {
-			LOG.error("Error occurred", e);
-			e.printStackTrace();
-		}
-	}*/
 
 }

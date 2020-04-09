@@ -1,7 +1,8 @@
 package com.epam.lab.model.exceptions;
 
-@SuppressWarnings("serial")
 public class GiftException extends Exception {
+
+    private static final long serialVersionUID = 1L;
 
     public GiftException() {
     }

@@ -4,14 +4,18 @@ import com.epam.lab.model.ItemGiftBuilder;
 import com.epam.lab.model.ItemGiftParser;
 import com.epam.lab.model.NewYearGift;
 import com.epam.lab.model.exceptions.CreateDocumentConfigurationException;
-import com.epam.lab.model.sweets.Sweets;
+import com.epam.lab.model.sweets.Sweet;
 import org.apache.log4j.Logger;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,21 +23,16 @@ import java.util.Collections;
 import java.util.Formatter;
 
 public class GiftController {
+    private final static int START_OF_COUNT = 1;
     private static final Logger LOG = Logger.getLogger(GiftController.class);
 
     private NewYearGift newYearGift;
-
-    private ArrayList<Sweets> items;
-
+    private ArrayList<Sweet> items;
     private Formatter formatter;
 
     private ItemGiftParser giftParser;
-
-    private double totalWeight = 0;
-
+    private double totalWeight;
     private int counter = 1;
-
-    private final static int START_OF_COUNT = 1;
 
     public void setCounter(int counter) {
         this.counter = counter;
@@ -44,7 +43,7 @@ public class GiftController {
     }
 
     public GiftController() throws CreateDocumentConfigurationException {
-        items = new ArrayList<Sweets>();
+        items = new ArrayList<>();
         newYearGift = new NewYearGift();
         formatter = new Formatter(System.out);
         giftParser = new ItemGiftParser();
@@ -57,88 +56,83 @@ public class GiftController {
         formatter.format("%-3s%-20s %5s %10s\n", "-", "----", "-----", "------");
     }
 
-    private void print(Sweets item) {
-        formatter.format("%-3d%-20.15s %5.2f %10.2f\n", counter++, item
-                .getClass().getSimpleName(), item.getSugarLevel(), item
-                .getWeight());
+    private void print(Sweet item) {
+        formatter.format("%-3d%-20.15s %5.2f %10.2f\n", counter++,
+                item.getClass().getSimpleName(),
+                item.getSugarLevel(),
+                item.getWeight());
         totalWeight += item.getWeight();
     }
 
     private void printTotalWeight() {
         formatter.format("%-23s %5s %10s\n", "", "", "------");
-        formatter.format("%-3s%-20s %5s %10.2f\n", "", "Total Weight", "",
-                totalWeight);
+        formatter.format("%-3s%-20s %5s %10.2f\n", "", "Total Weight", "", totalWeight);
     }
 
     private void printSpace() {
-        formatter.format("\n%-38s\n\n\n",
-                "========================================");
+        formatter.format("\n%-38s\n\n\n", "========================================");
     }
 
     private void generateGift(int nTimes) {
         items = newYearGift.generate(nTimes);
 
-        for (Sweets sweet : items) {
+        for (Sweet sweet : items) {
             print(sweet);
         }
     }
 
     private void printGift() {
-        for (Sweets item : items) {
+        for (Sweet item : items) {
             print(item);
         }
     }
 
-    private void printGift(ArrayList<Sweets> sweets) {
-        for (Sweets sweet : sweets) {
+    private void printGift(ArrayList<Sweet> sweets) {
+        for (Sweet sweet : sweets) {
             print(sweet);
         }
     }
 
     public void writeToXmlFile(String xmlContent) {
         File theDir = new File("./output");
+
         if (!theDir.exists())
             theDir.mkdir();
 
-        String fileName = "./output/" + this.getClass().getSimpleName() + "_"
-                + Calendar.getInstance().getTimeInMillis() + ".xml";
+        String fileName = String.format("./output/%s_%s.xml", "GiftList", Calendar.getInstance().getTimeInMillis());
 
-        try (OutputStream stream = new FileOutputStream(new File(fileName))) {
-            try (OutputStreamWriter out = new OutputStreamWriter(stream, StandardCharsets.UTF_16)) {
-                out.write(xmlContent);
-                out.write("\n");
-            }
+        try (OutputStream stream = new FileOutputStream(new File(fileName));
+             OutputStreamWriter out = new OutputStreamWriter(stream, StandardCharsets.UTF_16)) {
+            out.write(xmlContent);
+            out.write(System.lineSeparator());
         } catch (IOException ex) {
             LOG.error("Cannot write to file!", ex);
         }
     }
 
     private String generateXml(ItemGiftBuilder builder) {
-        String out = null;
-
         Document doc = builder.build(items);
         DOMImplementation impl = doc.getImplementation();
         DOMImplementationLS implLS = (DOMImplementationLS) impl.getFeature("LS", "3.0");
 
         LSSerializer ser = implLS.createLSSerializer();
         ser.getDomConfig().setParameter("format-pretty-print", true);
-        out = ser.writeToString(doc);
 
-        return out;
+        return ser.writeToString(doc);
     }
 
-    private ArrayList<Sweets> extractSugar(double start, double end) {
-        ArrayList<Sweets> exList = new ArrayList<>();
+    private ArrayList<Sweet> extractSugar(double start, double end) {
+        ArrayList<Sweet> results = new ArrayList<>();
         Collections.sort(items, newYearGift.getSugarLevelComparator());
 
-        for (Sweets sweet : items) {
+        for (Sweet sweet : items) {
             double value = sweet.getSugarLevel();
             if (value >= start && value <= end) {
-                exList.add(sweet);
+                results.add(sweet);
             }
         }
 
-        return exList;
+        return results;
     }
 
 /*	public static void main(String[] args) throws CreateDocumentConfigurationException {
@@ -164,9 +158,8 @@ public class GiftController {
 	}*/
 
     public void showExtractedSugar(double lowLimit, double higherLimit) {
-        ArrayList<Sweets> extract = extractSugar(lowLimit, higherLimit);
-        printTitle("New Year's Gift with extracted sugar\n(from "
-                + lowLimit + " to " + higherLimit + "):");
+        ArrayList<Sweet> extract = extractSugar(lowLimit, higherLimit);
+        printTitle(String.format("New Year's Gift with extracted sugar%n(from %s to %s):", lowLimit, higherLimit));
         printGift(extract);
         printTotalWeight();
         printSpace();
@@ -216,7 +209,7 @@ public class GiftController {
 
     public void showParsedData() {
         printTitle("New Year's Gift (list of contents):");
-        for (Sweets sweet : items) {
+        for (Sweet sweet : items) {
             print(sweet);
         }
         printTotalWeight();

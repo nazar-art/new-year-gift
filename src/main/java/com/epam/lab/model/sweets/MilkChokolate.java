@@ -1,6 +1,6 @@
 package com.epam.lab.model.sweets;
 
-public class MilkChokolate extends Sweets {
+public class MilkChokolate extends Sweet {
 
     public MilkChokolate() {
         super();

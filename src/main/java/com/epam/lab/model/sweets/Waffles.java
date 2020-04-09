@@ -1,6 +1,6 @@
 package com.epam.lab.model.sweets;
 
-public class Waffles extends Sweets {
+public class Waffles extends Sweet {
 
     public Waffles() {
     }

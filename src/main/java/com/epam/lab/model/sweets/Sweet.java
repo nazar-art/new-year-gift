@@ -1,9 +1,8 @@
 package com.epam.lab.model.sweets;
 
-public abstract class Sweets {
+public abstract class Sweet {
 
     private double sugarLevel;
-
     private double weight;
 
     public double getSugarLevel() {
@@ -23,9 +22,6 @@ public abstract class Sweets {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName() + " " + sugarLevel + " " + weight);
-        return sb.toString();
+        return String.format("%s %s %s", getClass().getSimpleName(), sugarLevel, weight);
     }
-
 }

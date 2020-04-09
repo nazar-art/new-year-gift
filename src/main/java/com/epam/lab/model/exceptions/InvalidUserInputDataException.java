@@ -1,18 +1,11 @@
 package com.epam.lab.model.exceptions;
 
-@SuppressWarnings("serial")
 public class InvalidUserInputDataException extends RuntimeException {
+
+    private static final long serialVersionUID = 0L;
 
     public InvalidUserInputDataException() {
         super();
-    }
-
-    public InvalidUserInputDataException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public InvalidUserInputDataException(String message) {
-        super(message);
     }
 
 }

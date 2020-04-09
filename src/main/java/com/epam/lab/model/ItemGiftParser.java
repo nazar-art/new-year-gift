@@ -3,7 +3,7 @@ package com.epam.lab.model;
 import com.epam.lab.model.exceptions.CreateDocumentConfigurationException;
 import com.epam.lab.model.exceptions.XmlNotFoundException;
 import com.epam.lab.model.exceptions.XmlParseException;
-import com.epam.lab.model.sweets.Sweets;
+import com.epam.lab.model.sweets.Sweet;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
@@ -16,17 +16,15 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class ItemGiftParser {
-
     private static final Logger LOG = Logger.getLogger(ItemGiftParser.class);
 
     private DocumentBuilder builder;
-
     private XPath path;
 
     /**
      * Constructs a parser that can parse item lists.
      *
-     * @throws CreateDocumentConfigurationException
+     * @throws CreateDocumentConfigurationException exception during document creation.
      */
     public ItemGiftParser() throws CreateDocumentConfigurationException {
         try {
@@ -43,49 +41,13 @@ public class ItemGiftParser {
     /**
      * Parses an XML file containing an item list.
      *
-     * @param fileName the name of the file
+     * @param file the file to parse.
      * @return an array list containing all items in the XML file
-     * @throws XmlParseException
+     * @throws XmlParseException exception during parsing xml file.
      */
     @SuppressWarnings("unchecked")
-    public ArrayList<Sweets> parse(String fileName) throws XmlParseException {
-
-        ArrayList<Sweets> items = new ArrayList<Sweets>();
-        try {
-            File file = new File(fileName);
-            Document doc;
-            try {
-                doc = builder.parse(file);
-            } catch (Exception e) {
-                LOG.error("xml file not found", e);
-                throw new XmlNotFoundException("xml file wasn't found", e);
-            }
-
-            int itemCount = Integer.parseInt(path.evaluate("count(/gift/item)", doc));
-
-            for (int i = 1; i <= itemCount; i++) {
-
-                double sugar = Double.parseDouble(path.evaluate("/gift/item[" + i + "]/@sugar", doc));
-                String name = path.evaluate("/gift/item[" + i + "]/name", doc);
-                double weight = Double.parseDouble(path.evaluate("/gift/item[" + i
-                        + "]/weight", doc));
-
-                @SuppressWarnings("rawtypes")
-                Class cl = Class.forName("com.epam.lab.model.sweets." + name);
-                items.add(((Sweets) cl.getConstructor(double.class, double.class).newInstance(sugar, weight)));
-            }
-        } catch (Exception e) {
-            LOG.error("exception with parsing xml file", e);
-            throw new XmlParseException("exception with parsing xml file", e);
-        }
-
-        return items;
-    }
-
-    @SuppressWarnings("unchecked")
-    public ArrayList<Sweets> parse(File file) throws XmlParseException {
-
-        ArrayList<Sweets> items = new ArrayList<Sweets>();
+    public ArrayList<Sweet> parse(File file) throws XmlParseException {
+        ArrayList<Sweet> items = new ArrayList<>();
         try {
             Document doc;
             try {
@@ -102,16 +64,13 @@ public class ItemGiftParser {
                 double sugar;
                 sugar = Double.parseDouble(path.evaluate("/gift/item[" + i + "]/@sugar", doc));
                 String name = path.evaluate("/gift/item[" + i + "]/name", doc);
-                double weight = Double.parseDouble(path.evaluate("/gift/item[" + i
-                        + "]/weight", doc));
+                double weight = Double.parseDouble(path.evaluate("/gift/item[" + i + "]/weight", doc));
 
                 // checking
                 //System.out.printf("%s with %f has %f weight%n", name, sugar, weight);
-                @SuppressWarnings("rawtypes")
+                @SuppressWarnings({"rawtypes"})
                 Class cl = Class.forName("com.epam.lab.model.sweets." + name);
-                items.add(((Sweets) cl.getConstructor(double.class, double.class)
-                        .newInstance(sugar, weight)));
-
+                items.add(((Sweet) cl.getConstructor(double.class, double.class).newInstance(sugar, weight)));
             }
         } catch (Exception e) {
             LOG.error("exception with parsing xml file", e);

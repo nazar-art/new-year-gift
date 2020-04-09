@@ -1,6 +1,6 @@
 package com.epam.lab.model.sweets;
 
-public class Chewy extends Sweets {
+public class Chewy extends Sweet {
 
     public Chewy() {
     }
