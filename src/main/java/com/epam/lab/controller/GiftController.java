@@ -93,7 +93,7 @@ public class GiftController {
         }
     }
 
-    public void writeToXmlFile(String xmlContent) {
+    private void writeToXmlFile(String xmlContent) {
         File theDir = new File("./output");
 
         if (!theDir.exists())
@@ -110,7 +110,7 @@ public class GiftController {
         }
     }
 
-    private String generateXml(ItemGiftBuilder builder) {
+    private String generateXmlContent(ItemGiftBuilder builder) {
         Document doc = builder.build(items);
         DOMImplementation impl = doc.getImplementation();
         DOMImplementationLS implLS = (DOMImplementationLS) impl.getFeature("LS", "3.0");
@@ -168,7 +168,7 @@ public class GiftController {
 
     public void writeToXmlFile() throws CreateDocumentConfigurationException {
         ItemGiftBuilder builder = new ItemGiftBuilder();
-        String xmlContent = generateXml(builder);
+        String xmlContent = generateXmlContent(builder);
         writeToXmlFile(xmlContent);
     }
 
